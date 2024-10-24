@@ -34,7 +34,7 @@ class Lesson(models.Model):
         upload_to="lessons/", verbose_name="Изображение урока", **NULLABLE
     )
     course = models.ForeignKey(
-        Course, on_delete=models.SET_NULL, verbose_name="Курс", **NULLABLE
+        Course, on_delete=models.SET_NULL, verbose_name="Курс", **NULLABLE, related_name='lesson_set'
     )
     url = models.URLField(verbose_name="Ссылка на видео", **NULLABLE)
 
