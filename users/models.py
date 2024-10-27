@@ -42,19 +42,15 @@ class Payments(models.Model):
     )
     date = models.DateField(auto_now_add=True, verbose_name="Дата оплаты")
     course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        verbose_name="Оплаченный курс",
-        **NULLABLE
+        Course, on_delete=models.CASCADE, verbose_name="Оплаченный курс", **NULLABLE
     )
     lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        verbose_name="Оплаченный урок",
-        **NULLABLE
+        Lesson, on_delete=models.CASCADE, verbose_name="Оплаченный урок", **NULLABLE
     )
     amount = models.PositiveIntegerField(verbose_name="Сумма оплаты")
-    method = models.CharField(max_length=50, choices=PAYMENTS_METHOD, verbose_name="Способ оплаты")
+    method = models.CharField(
+        max_length=50, choices=PAYMENTS_METHOD, verbose_name="Способ оплаты"
+    )
 
     def __str__(self):
         return f"{self.user} - {self.course if self.course else self.lesson}"
