@@ -9,15 +9,19 @@ from materials.serializers import (CourseDetailSerializer, CourseSerializer,
                                    LessonSerializer)
 from users.permissions import IsModer, IsOwner
 
+from django.shortcuts import get_object_or_404
+
 
 class CourseViewSet(ModelViewSet):
     """
     Viewset для работы с курсами.
     """
-
     queryset = Course.objects.all()
 
     def get_serializer_class(self):
+        """
+        В зависимости от действия возвращает соответствующий serializer.
+        """
         if self.action == "retrieve":
             return CourseDetailSerializer
         return CourseSerializer
@@ -34,13 +38,22 @@ class CourseViewSet(ModelViewSet):
         """
         Проверяет права доступа для различных действий.
         """
-        if self.action in ['create',]:
+        if self.action in ['create', ]:
             self.permission_classes = (~IsModer,)
         elif self.action in ['update', 'retrieve']:
             self.permission_classes = (IsModer | IsOwner,)
         elif self.action == 'destroy':
             self.permission_classes = (IsOwner | ~IsModer,)
+
         return super().get_permissions()
+
+    def get_queryset(self):
+        """
+        Выбирает только курсы текущего пользователя, кроме группы модератора
+        """
+        if self.request.user.groups.filter(name="moders").exists():
+            return Course.objects.all()
+        return Course.objects.filter(owner=self.request.user)
 
 
 class LessonCreateAPIView(CreateAPIView):
@@ -68,6 +81,24 @@ class LessonListAPIView(ListAPIView):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+
+    def get_queryset(self):
+        """
+        Выбирает только уроки текущего пользователя, кроме группы модератора
+        """
+        if self.request.user.groups.filter(name="moders").exists():
+            return Lesson.objects.all()
+        return Lesson.objects.filter(owner=self.request.user)
+
+
+class LessonDetailAPIView(RetrieveAPIView):
+    """
+    API view для получения информации о конкретном уроке.
+    """
+
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = (IsAuthenticated, IsModer | IsOwner)
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
