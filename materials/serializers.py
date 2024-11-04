@@ -1,19 +1,22 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from materials.models import Course, Lesson
+from materials.validators import url_validator
 
 
-class LessonSerializer(ModelSerializer):
+class LessonSerializer(serializers.ModelSerializer):
     """
     Serializer для урока
     """
+    url = serializers.CharField(validators=[url_validator], read_only=True)
 
     class Meta:
         model = Lesson
         fields = "__all__"
 
 
-class CourseSerializer(ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     """
     Serializer для курса
     """
@@ -23,12 +26,12 @@ class CourseSerializer(ModelSerializer):
         fields = "__all__"
 
 
-class CourseDetailSerializer(ModelSerializer):
+class CourseDetailSerializer(serializers.ModelSerializer):
     """
     Serializer для детального представления курса
     """
 
-    count_lessons = SerializerMethodField()
+    count_lessons = serializers.SerializerMethodField()
     lesson_set = LessonSerializer(many=True, read_only=True)
 
     def get_count_lessons(self, instance):
