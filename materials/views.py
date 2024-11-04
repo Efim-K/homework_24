@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from materials.models import Course, Lesson
+from materials.paginators import ViewPagination
 from materials.serializers import (CourseDetailSerializer, CourseSerializer,
                                    LessonSerializer)
 from users.permissions import IsModer, IsOwner
@@ -17,6 +18,7 @@ class CourseViewSet(ModelViewSet):
     Viewset для работы с курсами.
     """
     queryset = Course.objects.all()
+    pagination_class = ViewPagination
 
     def get_serializer_class(self):
         """
@@ -81,6 +83,7 @@ class LessonListAPIView(ListAPIView):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    pagination_class = ViewPagination
 
     def get_queryset(self):
         """
