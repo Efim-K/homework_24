@@ -10,10 +10,10 @@ from rest_framework.views import APIView
 from materials.models import Course, Lesson, Subscription
 from materials.paginators import ViewPagination
 from materials.serializers import (CourseDetailSerializer, CourseSerializer,
-                                   LessonSerializer)
+                                   LessonSerializer, SubscriptionSerializer)
 from users.permissions import IsModer, IsOwner
 
-from django.shortcuts import get_object_or_404
+from rest_framework.generics import get_object_or_404
 
 
 class CourseViewSet(ModelViewSet):
@@ -141,6 +141,8 @@ class SubscriptionViewSet(APIView):
     """
     API эндпоинт для создания подписки на курс
     """
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
 
     def post(self, request):
         """
