@@ -3,8 +3,11 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from materials.models import Course, Lesson
+
+from materials.models import Course, Lesson, Subscription
 from materials.paginators import ViewPagination
 from materials.serializers import (CourseDetailSerializer, CourseSerializer,
                                    LessonSerializer)
@@ -132,3 +135,26 @@ class LessonDestroyAPIView(DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = (IsAuthenticated, ~IsModer | IsOwner)
+
+
+class SubscriptionViewSet(APIView):
+    """
+    API эндпоинт для создания подписки на курс
+    """
+
+    def post(self, request):
+        """
+        Создание или удаление подписки на курс
+        """
+        user_id = request.user
+        course_id = request.data.get('course_id')
+        course_item = get_object_or_404(Course, id=course_id)
+        sub_item = Subscription.objects.filter(user=user_id, course=course_item)
+
+        if sub_item.exists():
+            sub_item.delete()
+            message = "Подписка удалена"
+        else:
+            Subscription.objects.create(user=user_id, course=course_item)
+            message = "Подписка добавлена"
+        return Response({"message": message})
