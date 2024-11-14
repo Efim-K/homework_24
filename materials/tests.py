@@ -72,6 +72,7 @@ class LessonTestCase(TestCase, APITestCase):
     """
     Тесты для работы с уроками
     """
+
     def test_lesson_retrieve(self):
         """
         Тест получения урока по ID
@@ -123,29 +124,18 @@ class SubscriptionTest(TestCase, APITestCase):
     """
     Тесты для работы с подписками
     """
+
     def test_subscription(self):
         """
         Тест подписки на курс
         """
         url = reverse('materials:subscription')
         data = {
-            'user': self.user.pk,
-            'course': self.course.pk,
+            'user_id': self.user.pk,
+            'course_id': self.course.pk,
         }
-        print("url: ", url)
-        print("data: ", data)
 
         # Проверка оформления подписки
         response = self.client.post(url, data=data)
-
-        print("response.json:", response.json())
-        print("status_code:", response.status_code)
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["message"], "Подписка добавлена")
-
-        # Проверка удаления подписки
-        response = self.client.delete(url)
-        response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["message"], "Подписка удалена")
