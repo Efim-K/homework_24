@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
 from materials.models import Course, Lesson, Subscription
 from materials.paginators import ViewPagination
 from materials.serializers import (CourseDetailSerializer, CourseSerializer,
