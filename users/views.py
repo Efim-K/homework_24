@@ -6,6 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from users.models import Payments, User
 from users.serializers import PaymentsSerializer, UserSerializer
+from users.services import convert_rur_to_usd, create_stripe_price, create_stripe_session
 
 
 class UserViewSet(ModelViewSet):
@@ -51,3 +52,12 @@ class PaymentsCreateAPIView(CreateAPIView):
 
     serializer_class = PaymentsSerializer
     queryset = Payments.objects.all()
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        amount_in_usd = convert_rur_to_usd(payment.amount)
+        price = create_stripe_price(amount_in_usd)
+        session_id, link = create_stripe_session(price)
+        payment.session_id = session_id
+        payment.link = link
+        payment.save()

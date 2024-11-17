@@ -38,7 +38,7 @@ class Payments(models.Model):
     )
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+        User, on_delete=models.CASCADE, verbose_name="Пользователь", **NULLABLE,
     )
     date = models.DateField(auto_now_add=True, verbose_name="Дата оплаты")
     course = models.ForeignKey(
@@ -49,7 +49,23 @@ class Payments(models.Model):
     )
     amount = models.PositiveIntegerField(verbose_name="Сумма оплаты")
     method = models.CharField(
-        max_length=50, choices=PAYMENTS_METHOD, verbose_name="Способ оплаты"
+        max_length=50, default="Перевод на счет", choices=PAYMENTS_METHOD, verbose_name="Способ оплаты", **NULLABLE
+    )
+
+    session_id = models.CharField(
+        max_length=255,
+        verbose_name="ID сессии",
+        **NULLABLE,
+    )
+    link = models.URLField(
+        max_length=400,
+        verbose_name="Ссылка на оплату",
+        **NULLABLE,
+    )
+    status = models.CharField(
+        max_length=50,
+        verbose_name="Статус платежа",
+        **NULLABLE,
     )
 
     def __str__(self):
