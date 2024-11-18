@@ -119,7 +119,7 @@ MEDIA_ROOT = BASE_DIR.joinpath("media")
 
 AUTH_USER_MODEL = "users.User"
 
-STRIPE_API_KEY = os.getenv("STRIPE_API_KEY"),
+STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 
 # LOGIN_REDIRECT_URL = "/"
 # LOGOUT_REDIRECT_URL = "/"
