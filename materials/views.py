@@ -14,6 +14,8 @@ from users.permissions import IsModer, IsOwner
 
 from rest_framework.generics import get_object_or_404
 
+from materials.tasks import add
+
 
 class CourseViewSet(ModelViewSet):
     """
@@ -77,6 +79,7 @@ class LessonCreateAPIView(CreateAPIView):
         """
         lesson = serializer.save()
         lesson.owner = self.request.user
+        add.delay()
         lesson.save()
 
 
