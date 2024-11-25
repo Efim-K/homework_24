@@ -7,5 +7,5 @@ def url_validator(value):
     """
     if not value:
         return None
-    elif 'youtube.com' not in value:
+    elif "youtube.com" not in value:
         raise ValidationError("Ссылка на видео разрешена только с сайта youtube.com")

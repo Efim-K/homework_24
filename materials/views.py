@@ -1,26 +1,24 @@
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
-                                     UpdateAPIView)
-from rest_framework.viewsets import ModelViewSet
+                                     UpdateAPIView, get_object_or_404)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from materials.models import Course, Lesson, Subscription
 from materials.paginators import ViewPagination
 from materials.serializers import (CourseDetailSerializer, CourseSerializer,
                                    LessonSerializer, SubscriptionSerializer)
+from materials.tasks import send_email_update_course
 from users.permissions import IsModer, IsOwner
-
-from rest_framework.generics import get_object_or_404
-
-from materials.tasks import add
 
 
 class CourseViewSet(ModelViewSet):
     """
     Viewset для работы с курсами.
     """
+
     queryset = Course.objects.all()
     pagination_class = ViewPagination
 
@@ -40,15 +38,22 @@ class CourseViewSet(ModelViewSet):
         course.owner = self.request.user
         course.save()
 
+    def perform_update(self, serializer):
+        course = serializer.save()
+        send_email_update_course.delay(course.pk)
+        return course
+
     def get_permissions(self):
         """
         Проверяет права доступа для различных действий.
         """
-        if self.action in ['create', ]:
+        if self.action in [
+            "create",
+        ]:
             self.permission_classes = (~IsModer,)
-        elif self.action in ['update', 'retrieve']:
+        elif self.action in ["update", "retrieve"]:
             self.permission_classes = (IsModer | IsOwner,)
-        elif self.action == 'destroy':
+        elif self.action == "destroy":
             self.permission_classes = (IsOwner | ~IsModer,)
         return super().get_permissions()
 
@@ -56,7 +61,7 @@ class CourseViewSet(ModelViewSet):
         """
         Выбирает только курсы текущего пользователя, кроме группы модератора
         """
-        if (self.permission_classes != (IsModer | IsOwner,)):
+        if self.permission_classes != (IsModer | IsOwner,):
             return Course.objects.none()
 
         if self.request.user.groups.filter(name="moders").exists():
@@ -79,7 +84,6 @@ class LessonCreateAPIView(CreateAPIView):
         """
         lesson = serializer.save()
         lesson.owner = self.request.user
-        add.delay()
         lesson.save()
 
 
@@ -96,7 +100,7 @@ class LessonListAPIView(ListAPIView):
         """
         Выбирает только уроки текущего пользователя, кроме группы модератора
         """
-        if (self.permission_classes != (IsModer | IsOwner,)):
+        if self.permission_classes != (IsModer | IsOwner,):
             return Lesson.objects.none()
 
         if self.request.user.groups.filter(name="moders").exists():
@@ -148,6 +152,7 @@ class SubscriptionViewSet(APIView):
     """
     API эндпоинт для создания подписки на курс
     """
+
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
 
@@ -156,7 +161,7 @@ class SubscriptionViewSet(APIView):
         Создание или удаление подписки на курс
         """
         user_id = request.user
-        course_id = request.data.get('course_id')
+        course_id = request.data.get("course_id")
         course_item = get_object_or_404(Course, id=course_id)
         sub_item = Subscription.objects.filter(user=user_id, course=course_item)
 

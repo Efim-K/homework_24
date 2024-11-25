@@ -9,6 +9,7 @@ class LessonSerializer(serializers.ModelSerializer):
     """
     Serializer для урока
     """
+
     url = serializers.CharField(validators=[url_validator], read_only=True)
 
     class Meta:
@@ -30,6 +31,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     """
     Serializer для детального представления курса
     """
+
     #
     count_lessons = serializers.SerializerMethodField()
     lesson_set = LessonSerializer(many=True, read_only=True)
@@ -51,7 +53,13 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ("name", "description", "count_lessons", "lesson_set", "subscription_sign")
+        fields = (
+            "name",
+            "description",
+            "count_lessons",
+            "lesson_set",
+            "subscription_sign",
+        )
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

@@ -20,7 +20,7 @@ class Course(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         verbose_name="Создатель курса",
-        **NULLABLE
+        **NULLABLE,
     )
 
     def __str__(self):
@@ -47,7 +47,7 @@ class Lesson(models.Model):
         on_delete=models.SET_NULL,
         verbose_name="Курс",
         **NULLABLE,
-        related_name="lesson_set"
+        related_name="lesson_set",
     )
     url = models.URLField(verbose_name="Ссылка на видео", **NULLABLE)
 
@@ -55,7 +55,7 @@ class Lesson(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         verbose_name="Создатель урока",
-        **NULLABLE
+        **NULLABLE,
     )
 
     def __str__(self):
@@ -68,22 +68,14 @@ class Lesson(models.Model):
 
 
 class Subscription(models.Model):
-
     """
     Модель подписки
     """
+
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name="Пользователь"
-
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь"
     )
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        verbose_name="Курс"
-
-    )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Курс")
 
     class Meta:
         verbose_name = "Подписка"

@@ -38,7 +38,10 @@ class Payments(models.Model):
     )
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Пользователь", **NULLABLE,
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        **NULLABLE,
     )
     date = models.DateField(auto_now_add=True, verbose_name="Дата оплаты")
     course = models.ForeignKey(
@@ -49,7 +52,11 @@ class Payments(models.Model):
     )
     amount = models.PositiveIntegerField(verbose_name="Сумма оплаты")
     method = models.CharField(
-        max_length=50, default="Перевод на счет", choices=PAYMENTS_METHOD, verbose_name="Способ оплаты", **NULLABLE
+        max_length=50,
+        default="Перевод на счет",
+        choices=PAYMENTS_METHOD,
+        verbose_name="Способ оплаты",
+        **NULLABLE,
     )
 
     session_id = models.CharField(

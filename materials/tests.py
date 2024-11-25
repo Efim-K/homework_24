@@ -13,7 +13,9 @@ class TestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="test@test.ru")
         self.course = Course.objects.create(name="Test Course", owner=self.user)
-        self.lesson = Lesson.objects.create(name="Test Lesson", course=self.course, owner=self.user)
+        self.lesson = Lesson.objects.create(
+            name="Test Lesson", course=self.course, owner=self.user
+        )
         self.client.force_authenticate(user=self.user)
 
 
@@ -26,20 +28,20 @@ class CourseTestCase(TestCase, APITestCase):
         """
         Тест получения курса по ID
         """
-        url = reverse('materials:course-detail', args=(self.course.pk,))
+        url = reverse("materials:course-detail", args=(self.course.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['name'], self.course.name)
+        self.assertEqual(response.json()["name"], self.course.name)
 
     def test_course_create(self):
         """
         Тест создания нового курса
         """
-        url = reverse('materials:course-list')
+        url = reverse("materials:course-list")
         data = {
-            'name': 'Test Course 2',
-            'description': 'Test description',
-            'owner': self.user.pk,
+            "name": "Test Course 2",
+            "description": "Test description",
+            "owner": self.user.pk,
         }
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 201)
@@ -49,20 +51,22 @@ class CourseTestCase(TestCase, APITestCase):
         """
         Тест изменения курса по ID
         """
-        url = reverse('materials:course-detail', args=(self.course.pk,))
+        url = reverse("materials:course-detail", args=(self.course.pk,))
         data = {
-            'name': 'Updated Test Course',
-            'description': 'Updated test description',
+            "name": "Updated Test Course",
+            "description": "Updated test description",
         }
         response = self.client.put(url, data=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Course.objects.get(pk=self.course.pk).name, 'Updated Test Course')
+        self.assertEqual(
+            Course.objects.get(pk=self.course.pk).name, "Updated Test Course"
+        )
 
     def test_course_delete(self):
         """
         Тест удаления курса по ID
         """
-        url = reverse('materials:course-detail', args=(self.course.pk,))
+        url = reverse("materials:course-detail", args=(self.course.pk,))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Course.objects.count(), 0)
@@ -77,20 +81,20 @@ class LessonTestCase(TestCase, APITestCase):
         """
         Тест получения урока по ID
         """
-        url = reverse('materials:lessons-retrieve', args=(self.lesson.pk,))
+        url = reverse("materials:lessons-retrieve", args=(self.lesson.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['name'], self.lesson.name)
+        self.assertEqual(response.json()["name"], self.lesson.name)
 
     def test_lesson_create(self):
         """
         Тест создания нового урока
         """
-        url = reverse('materials:lessons-create')
+        url = reverse("materials:lessons-create")
         data = {
-            'name': 'Test Lesson 2',
-            'course': self.course.pk,
-            'owner': self.user.pk,
+            "name": "Test Lesson 2",
+            "course": self.course.pk,
+            "owner": self.user.pk,
         }
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 201)
@@ -100,21 +104,23 @@ class LessonTestCase(TestCase, APITestCase):
         """
         Тест изменения урока по ID
         """
-        url = reverse('materials:lessons-update', args=(self.lesson.pk,))
+        url = reverse("materials:lessons-update", args=(self.lesson.pk,))
         data = {
-            'name': 'Updated Test Lesson',
-            'course': self.course.pk,
-            'owner': self.user.pk,
+            "name": "Updated Test Lesson",
+            "course": self.course.pk,
+            "owner": self.user.pk,
         }
         response = self.client.put(url, data=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Lesson.objects.get(pk=self.lesson.pk).name, 'Updated Test Lesson')
+        self.assertEqual(
+            Lesson.objects.get(pk=self.lesson.pk).name, "Updated Test Lesson"
+        )
 
     def test_lesson_delete(self):
         """
         Тест удаления урока по ID
         """
-        url = reverse('materials:lessons-destroy', args=(self.lesson.pk,))
+        url = reverse("materials:lessons-destroy", args=(self.lesson.pk,))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Lesson.objects.count(), 0)
@@ -129,10 +135,10 @@ class SubscriptionTest(TestCase, APITestCase):
         """
         Тест подписки на курс
         """
-        url = reverse('materials:subscription')
+        url = reverse("materials:subscription")
         data = {
-            'user_id': self.user.pk,
-            'course_id': self.course.pk,
+            "user_id": self.user.pk,
+            "course_id": self.course.pk,
         }
 
         # Проверка оформления подписки
